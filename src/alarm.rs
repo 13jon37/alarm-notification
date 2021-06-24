@@ -1,8 +1,5 @@
 extern crate msgbox;
 
-//mod timemanager;
-//mod config;
-
 use crate::timemanager::TimeManager;
 use crate::config::ConfigReader;
 use msgbox::IconType;

@@ -69,7 +69,3 @@ pub fn get_current_seconds() -> u32 {
     let time = Local::now();
     return time.second();
 }
-
-
-
-
