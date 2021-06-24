@@ -18,11 +18,11 @@ impl TimeManager {
     pub fn new() -> Self {
         // Just null init I guess
         Self {
-            time_day: "".to_string(),
+            time_day: String::from(""),
             time_hours: 0,
             time_minutes: 0,
             time_seconds: 0,
-            time_meridian: "".to_string(),
+            time_meridian: String::from(""),
         }
     }
 
@@ -47,7 +47,7 @@ impl TimeManager {
         self.time_minutes = time.minute();
         self.time_seconds = time.second();
 
-        println!("Day: {}  {}:{}:{} {}", self.time_day,
+        println!("Day: {}  {}:{}:{} {}\n", self.time_day,
                                          self.time_hours,
                                          self.time_minutes,
                                          self.time_seconds,
@@ -79,6 +79,7 @@ pub fn get_current_seconds() -> u32 {
 pub struct ConfigReader {
     contents: Vec<String>,
     file: File,
+    num_of_lines: u32,
 }
 
 impl ConfigReader {
@@ -86,6 +87,7 @@ impl ConfigReader {
         Self {
             contents: Vec::new(),
             file: File::open(file).unwrap(),
+            num_of_lines: 0,
         }
     }
 
@@ -94,8 +96,49 @@ impl ConfigReader {
         // Read by each line
         for (index, line) in reader.lines().enumerate() {
             let line = line.unwrap(); // ignore errors
-            println!("{}. {}", index + 1, line);
+            self.contents.push(line);
+            self.num_of_lines = (index as u32) + 1;
         }
+        
+        let mut count = 0;
+        for i in 0..self.num_of_lines {
+            println!("Content {}: {}", i + 1, self.contents[count]);
+            count += 1;
+        }
+    }
+}
+
+pub struct Alarm {
+    day: String,
+    hours: u32,
+    minutes: u32,
+    meridian: String,
+}
+
+impl Alarm {
+    pub fn new() -> Self {
+        Self {
+            day: String::from(""),
+            hours: 0,
+            minutes: 0,
+            meridian: String::from(""),
+        }
+    }
+
+    pub fn alarm_system(&self, time: &TimeManager, config: &ConfigReader) {
+        let son = String::from("Son");
+        let mon = String::from("Mon");
+        let tue = String::from("Tue");
+        let wed = String::from("Wed");
+        let thu = String::from("Thu");
+        let fri = String::from("Fri");
+        let sat = String::from("Sat");
+
+        match &time.time_day {
+           thu  => message_box(time.get_day()),
+        }
+
+        // Have match statements here
     }
 }
 
@@ -110,18 +153,24 @@ fn message_box(contents: &str) {
 }
 
 fn main() {
+    // Init everything
     let mut time = TimeManager::new();
     let mut config = ConfigReader::new("alarm.conf");
+    let alarm = Alarm::new();
 
     // Check the current time seconds and wait so we can get in sync
-    if get_current_seconds() > 0 {
+   /* if get_current_seconds() > 0 {
         println!("Waiting to sync: {}", 60 - get_current_seconds());
         thread::sleep(time::Duration::from_secs(60 - get_current_seconds() as u64));
-    }
+    }*/
 
-    'running: loop {
+    loop {
+        // Start time manager and read the config
         time.get_time();
         config.read();
+
+        // Alarm system
+        alarm.alarm_system(&time, &config);
 
         thread::sleep(time::Duration::from_secs(60));
     }
