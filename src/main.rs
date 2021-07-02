@@ -6,8 +6,8 @@ use std::{thread, time};
 
 fn main() {
     let mut time   = timemanager::TimeManager::new();
-    let mut config = config::ConfigReader::new("alarm.conf");
-    let alarm      = alarm::Alarm::new();
+    let mut config_reader = config::ConfigReader::new("alarm.conf");
+    let mut config = config::Config::new();
 
     // Check the current time seconds and wait so we can get in sync
     if timemanager::get_current_seconds() > 0 {
@@ -17,10 +17,10 @@ fn main() {
     loop {
         // Start time manager and read the config
         time.get_time();
-        config.read();
+        config_reader.run(&mut config);
 
         // Alarm system
-        alarm.alarm_system(&time, &config);
+        alarm::alarm_system(&config, &config_reader, &time);
 
         thread::sleep(time::Duration::from_secs(60));
     }

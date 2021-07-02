@@ -2,48 +2,26 @@ extern crate msgbox;
 
 use crate::timemanager::TimeManager;
 use crate::config::ConfigReader;
+use crate::config::Config;
 use msgbox::IconType;
 
-pub struct Alarm {
-    day: String,
-    hours: u32,
-    minutes: u32,
-    meridian: String,
+fn message_box(contents: &str) {
+    // Message box and borrow string contents
+    match msgbox::create("Alarm", contents, IconType::Info) {
+        Ok(()) => (),
+        Err(msgbox::MsgBoxError::Create(_)) => {
+            println!("Failed to create messagebox!");
+        }
+    }
 }
 
-impl Alarm {
-    pub fn new() -> Self {
-        Self {
-            day: String::from(""),
-            hours: 0,
-            minutes: 0,
-            meridian: String::from(""),
-        }
-    }
-
-    fn message_box(contents: &str) {
-        // Message box and borrow string contents
-        match msgbox::create("Alarm", contents, IconType::Info) {
-            Ok(()) => (),
-            Err(msgbox::MsgBoxError::Create(_)) => {
-                println!("Failed to create messagebox!");
+pub fn alarm_system(config: &Config, data: &ConfigReader, time: &TimeManager) {
+    for i in 0..data.contents.len() {
+        if &config.days[i] == time.get_day() &&
+           &config.hours[i] == time.get_hours() &&
+           &config.minutes[i] == time.get_minutes() &&
+           &config.meridians[i] == time.get_meridian() {
+                message_box(&config.alarm_messages[i]);
             }
-        }
-    }
-
-    pub fn alarm_system(&self, time: &TimeManager, config: &ConfigReader) {
-        let son = String::from("Son");
-        let mon = String::from("Mon");
-        let tue = String::from("Tue");
-        let wed = String::from("Wed");
-        let thu = String::from("Thu");
-        let fri = String::from("Fri");
-        let sat = String::from("Sat");
-
-        match &time.time_day {
-            thu  => Alarm::message_box(time.get_day()),
-        }
-
-        // Have match statements here
     }
 }
